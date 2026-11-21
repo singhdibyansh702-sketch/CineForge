@@ -46,30 +46,32 @@ def seed_initial_demo_data():
             db.commit()
             db.refresh(project)
 
-            # Generate demo sample source video
+            # Generate demo sample source video (lightweight for low memory cloud containers)
             sample_path = SAMPLES_DIR / "clipforge_demo_source.mp4"
-            if not sample_path.exists():
-                print("[ClipForge Startup] Generating demo 1080p source video...")
-                ffmpeg_service.generate_demo_source_video(str(sample_path), duration=60)
-
             thumb_path = SAMPLES_DIR / "clipforge_demo_thumb.jpg"
-            if not thumb_path.exists() and sample_path.exists():
-                ffmpeg_service.generate_thumbnail(str(sample_path), str(thumb_path), timestamp_sec=2.0)
+            if not sample_path.exists():
+                print("[ClipForge Startup] Initializing demo workspace (memory-optimized)...")
+                try:
+                    ffmpeg_service.generate_demo_source_video(str(sample_path), duration=10, width=1280, height=720)
+                    if sample_path.exists():
+                        ffmpeg_service.generate_thumbnail(str(sample_path), str(thumb_path), timestamp_sec=1.0)
+                except Exception as e:
+                    print(f"[ClipForge Startup] Note: sample video generation deferred: {e}")
 
             if sample_path.exists():
                 info = ffmpeg_service.get_video_info(str(sample_path))
                 source_video = SourceVideo(
                     project_id=project.id,
-                    filename="AI_Creator_Growth_Interview_1080p.mp4",
+                    filename="AI_Creator_Growth_Interview.mp4",
                     filepath=str(sample_path),
                     file_size=os.path.getsize(sample_path),
-                    duration=info.get("duration", 60.0),
-                    width=info.get("width", 1920),
-                    height=info.get("height", 1080),
-                    fps=info.get("fps", 30.0),
+                    duration=info.get("duration", 10.0),
+                    width=info.get("width", 1280),
+                    height=info.get("height", 720),
+                    fps=info.get("fps", 24.0),
                     format="mp4",
                     source_type="upload",
-                    thumbnail_path="/api/v1/videos/stream/clipforge_demo_thumb.jpg"
+                    thumbnail_path="/api/v1/videos/stream/clipforge_demo_thumb.jpg" if thumb_path.exists() else None
                 )
                 db.add(source_video)
                 db.commit()

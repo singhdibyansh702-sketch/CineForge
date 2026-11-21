@@ -109,23 +109,31 @@ class FFmpegService:
         ]
         return self.run_command(cmd)
 
-    def generate_demo_source_video(self, output_path: str, duration: int = 45) -> bool:
+    def generate_demo_source_video(
+        self,
+        output_path: str,
+        duration: int = 10,
+        width: int = 1280,
+        height: int = 720
+    ) -> bool:
         """
-        Creates a crisp 1080p landscape test video with dynamic visual elements and audio tone
-        so the app works out-of-the-box even before a user uploads a heavy file.
+        Creates a lightweight test video with minimal memory footprint (< 35MB RAM).
         """
+        box_w = int(width * 0.25)
+        box_x = int((width - box_w) / 2)
         filter_str = (
-            f"testsrc=duration={duration}:size=1920x1080:rate=30,"
-            "drawbox=x=720:y=0:w=480:h=1080:color=purple@0.25:t=fill,"
-            "drawbox=x=720:y=0:w=480:h=1080:color=white@0.8:t=4"
+            f"testsrc=duration={duration}:size={width}x{height}:rate=24,"
+            f"drawbox=x={box_x}:y=0:w={box_w}:h={height}:color=purple@0.25:t=fill,"
+            f"drawbox=x={box_x}:y=0:w={box_w}:h={height}:color=white@0.8:t=3"
         )
         audio_str = f"sine=frequency=440:duration={duration}"
         
         cmd = [
+            "-threads", "1",
             "-f", "lavfi", "-i", filter_str,
             "-f", "lavfi", "-i", audio_str,
             "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p",
-            "-c:a", "aac", "-b:a", "128k",
+            "-c:a", "aac", "-b:a", "96k",
             "-shortest",
             "-y",
             str(output_path)
@@ -338,6 +346,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         vf_str = ",".join(video_filters)
 
         cmd = [
+            "-threads", "1",
             "-ss", str(start_time),
             "-i", str(source_path),
             "-t", str(duration),
