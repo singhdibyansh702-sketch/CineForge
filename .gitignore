@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+venv/
+env/
+
+# Build outputs
+dist/
+build/
+.expo/
+.next/
+
+# User Data and large media files
+clipforge-backend/data/uploads/*
+clipforge-backend/data/exports/*
+clipforge-backend/data/subtitles/*
+!clipforge-backend/data/samples/
+*.mp4
+*.mov
+*.zip
+*.db
+*.sqlite3
+
+# OS Files
+.DS_Store
+Thumbs.db

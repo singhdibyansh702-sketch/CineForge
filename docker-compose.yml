@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  clipforge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clipforge-app
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - SECRET_KEY=production-secure-key-change-this
+    volumes:
+      - clipforge-data:/app/clipforge-backend/data
+    restart: unless-stopped
+
+volumes:
+  clipforge-data:

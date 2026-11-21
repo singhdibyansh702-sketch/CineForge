@@ -1,0 +1,12 @@
+node_modules
+clipforge-web/node_modules
+clipforge-android/node_modules
+__pycache__
+*.pyc
+*.pyo
+.git
+.gitignore
+clipforge-backend/data/uploads/*
+clipforge-backend/data/exports/*
+clipforge-backend/data/subtitles/*
+!clipforge-backend/data/samples/*

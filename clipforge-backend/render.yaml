@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: clipforge-api
+    env: docker
+    dockerfilePath: Dockerfile
+    plan: standard
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: SECRET_KEY
+        generateValue: true
+    disk:
+      name: clipforge-storage
+      mountPath: /app/data
+      sizeGB: 10

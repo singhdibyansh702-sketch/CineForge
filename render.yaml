@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: clipforge-studio
+    env: docker
+    dockerfilePath: Dockerfile
+    plan: standard
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: SECRET_KEY
+        generateValue: true
+    disk:
+      name: clipforge-media
+      mountPath: /app/clipforge-backend/data
+      sizeGB: 10
