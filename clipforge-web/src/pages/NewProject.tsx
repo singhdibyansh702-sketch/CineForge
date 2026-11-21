@@ -342,10 +342,160 @@ export const NewProject: React.FC<NewProjectProps> = ({ onNavigate, onProjectCre
           </div>
         </div>
 
-        {/* Section 2: Video Import Source */}
+        {/* Section 2: MANDATORY TIMESTAMPS & TIMELINES */}
+        <div className="p-6 rounded-xl bg-[#141414] dark:bg-[#141414] light:bg-white border-2 border-brand-500/50 dark:border-brand-500/50 light:border-brand-500/50 space-y-4 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#2A2A2A] dark:border-[#2A2A2A] light:border-zinc-200">
+            <div>
+              <div className="flex items-center gap-2">
+                <Scissors className="w-4 h-4 text-brand-400" />
+                <h3 className="text-sm font-bold text-white dark:text-white light:text-zinc-900 uppercase tracking-wider">
+                  2. Timestamps & Timelines * <span className="text-brand-400 font-mono text-xs font-normal">(Required / Non-Optional)</span>
+                </h3>
+              </div>
+              <p className="text-xs text-zinc-400 dark:text-zinc-400 light:text-zinc-500 mt-1">
+                Enter your start timestamp in <span className="font-mono text-white dark:text-white light:text-zinc-900 font-bold bg-brand-950/60 px-1.5 py-0.5 rounded border border-brand-800/60">HH:MM:SS</span> format so clipping starts from there. Add multiple timelines simultaneously with the <span className="font-bold text-brand-400">+ Add Timeline</span> button.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleAddTimeline}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs transition-colors shrink-0 shadow-sm self-start sm:self-auto"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Add Timeline</span>
+            </button>
+          </div>
+
+          {/* Timelines Rows */}
+          <div className="space-y-3">
+            {timelines.map((timeline, index) => (
+              <div
+                key={timeline.id}
+                className="p-4 rounded-xl bg-[#0A0A0A] dark:bg-[#0A0A0A] light:bg-zinc-50 border border-[#2A2A2A] dark:border-[#2A2A2A] light:border-zinc-200 space-y-3"
+              >
+                {/* Timeline Header */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-brand-600/20 text-brand-400 flex items-center justify-center text-[10px] font-bold">
+                      {index + 1}
+                    </span>
+                    <input
+                      type="text"
+                      value={timeline.name}
+                      onChange={(e) => handleUpdateTimeline(index, 'name', e.target.value)}
+                      placeholder={`Clip ${(index + 1).toString().padStart(2, '0')}`}
+                      className="px-2 py-1 rounded bg-[#141414] dark:bg-[#141414] light:bg-white border border-[#2A2A2A] dark:border-[#2A2A2A] light:border-zinc-200 text-xs font-semibold text-white dark:text-white light:text-zinc-900 focus:outline-none focus:border-brand-500 w-44"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleDuplicateTimeline(index)}
+                      className="p-1.5 rounded hover:bg-[#1C1C1C] dark:hover:bg-[#1C1C1C] light:hover:bg-zinc-200 text-zinc-400 hover:text-white transition-colors"
+                      title="Duplicate this timeline"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTimeline(index)}
+                      disabled={timelines.length <= 1}
+                      className="p-1.5 rounded hover:bg-red-900/40 text-zinc-400 hover:text-red-400 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                      title={timelines.length <= 1 ? 'At least one timeline is required' : 'Delete timeline'}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Timestamp Inputs Row */}
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                  {/* Start Timestamp (HH:MM:SS) - MANDATORY */}
+                  <div className="sm:col-span-5">
+                    <label className="block text-[11px] font-semibold text-zinc-300 dark:text-zinc-300 light:text-zinc-700 mb-1">
+                      Start Timestamp (HH:MM:SS) * <span className="text-red-400 font-bold">Required</span>
+                    </label>
+                    <div className="relative">
+                      <Clock className="w-3.5 h-3.5 text-brand-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <input
+                        type="text"
+                        required
+                        value={timeline.startHms}
+                        onChange={(e) => handleUpdateTimeline(index, 'startHms', e.target.value)}
+                        placeholder="00:02:15"
+                        pattern="^(?:(?:[0-9]{1,2}:)?[0-5]?[0-9]:[0-5][0-9])$"
+                        className="w-full pl-8 pr-3 py-2 rounded-lg bg-[#141414] dark:bg-[#141414] light:bg-white border border-[#2A2A2A] dark:border-[#2A2A2A] light:border-zinc-300 text-white dark:text-white light:text-zinc-900 font-mono text-xs focus:outline-none focus:border-brand-500"
+                      />
+                    </div>
+                    <span className="text-[10px] text-zinc-400 dark:text-zinc-400 light:text-zinc-500 mt-0.5 block">
+                      Clipping starts from this exact second (e.g. 00:02:15)
+                    </span>
+                  </div>
+
+                  {/* Duration (Seconds) */}
+                  <div className="sm:col-span-4">
+                    <label className="block text-[11px] font-semibold text-zinc-300 dark:text-zinc-300 light:text-zinc-700 mb-1">
+                      Duration (Seconds) *
+                    </label>
+                    <div className="flex gap-1.5 items-center">
+                      <input
+                        type="number"
+                        min="1"
+                        required
+                        value={timeline.duration}
+                        onChange={(e) => handleUpdateTimeline(index, 'duration', e.target.value)}
+                        className="w-20 px-2.5 py-2 rounded-lg bg-[#141414] dark:bg-[#141414] light:bg-white border border-[#2A2A2A] dark:border-[#2A2A2A] light:border-zinc-300 text-white dark:text-white light:text-zinc-900 font-mono text-xs focus:outline-none focus:border-brand-500"
+                      />
+                      <div className="flex gap-1">
+                        {[15, 30, 60].map((dur) => (
+                          <button
+                            key={dur}
+                            type="button"
+                            onClick={() => handleUpdateTimeline(index, 'duration', dur)}
+                            className={`px-2 py-1.5 rounded font-mono text-[10px] font-semibold transition-colors ${
+                              timeline.duration === dur
+                                ? 'bg-brand-600 text-white'
+                                : 'bg-[#1C1C1C] dark:bg-[#1C1C1C] light:bg-zinc-200 text-zinc-300 dark:text-zinc-300 light:text-zinc-700 hover:text-white'
+                            }`}
+                          >
+                            {dur}s
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Auto-Calculated End Timestamp */}
+                  <div className="sm:col-span-3">
+                    <label className="block text-[11px] font-semibold text-zinc-400 dark:text-zinc-400 light:text-zinc-500 mb-1">
+                      End Timestamp
+                    </label>
+                    <div className="px-3 py-2 rounded-lg bg-[#141414] dark:bg-[#141414] light:bg-zinc-100 border border-[#2A2A2A] dark:border-[#2A2A2A] light:border-zinc-200 text-zinc-300 dark:text-zinc-300 light:text-zinc-800 font-mono text-xs font-semibold text-center">
+                      {timeline.endHms}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Large "+ Add Another Timeline" Button */}
+          <button
+            type="button"
+            onClick={handleAddTimeline}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-[#2A2A2A] dark:border-[#2A2A2A] light:border-zinc-300 hover:border-brand-500 text-zinc-300 dark:text-zinc-300 light:text-zinc-700 hover:text-brand-400 text-xs font-semibold transition-all bg-[#0A0A0A]/40"
+          >
+            <Plus className="w-4 h-4 text-brand-400" />
+            <span>+ Add Another Timeline ({timelines.length} Timelines Added)</span>
+          </button>
+        </div>
+
+        {/* Section 3: Video Import Source */}
         <div className="p-6 rounded-xl bg-[#141414] dark:bg-[#141414] light:bg-white border border-[#2A2A2A] dark:border-[#2A2A2A] light:border-zinc-200 space-y-4">
           <h3 className="text-sm font-semibold text-white dark:text-white light:text-zinc-900 uppercase tracking-wider">
-            2. Video Source
+            3. Video Source
           </h3>
 
           <div className="flex border-b border-[#2A2A2A] dark:border-[#2A2A2A] light:border-zinc-200 gap-4 text-xs font-medium">
@@ -449,156 +599,6 @@ export const NewProject: React.FC<NewProjectProps> = ({ onNavigate, onProjectCre
               </p>
             </div>
           )}
-        </div>
-
-        {/* Section 3: MANDATORY TIMESTAMPS & TIMELINES */}
-        <div className="p-6 rounded-xl bg-[#141414] dark:bg-[#141414] light:bg-white border-2 border-brand-500/40 dark:border-brand-500/40 light:border-brand-500/40 space-y-4 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#2A2A2A] dark:border-[#2A2A2A] light:border-zinc-200">
-            <div>
-              <div className="flex items-center gap-2">
-                <Scissors className="w-4 h-4 text-brand-400" />
-                <h3 className="text-sm font-bold text-white dark:text-white light:text-zinc-900 uppercase tracking-wider">
-                  3. Timestamps & Timelines * <span className="text-brand-400 font-mono text-xs font-normal">(Required / Mandatory)</span>
-                </h3>
-              </div>
-              <p className="text-xs text-zinc-400 dark:text-zinc-400 light:text-zinc-500 mt-1">
-                Enter your start timestamp in <span className="font-mono text-white dark:text-white light:text-zinc-900 font-bold">HH:MM:SS</span> format so clipping starts from there. Add multiple timelines at once using the <span className="font-bold text-brand-400">+ Add Timeline</span> button.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleAddTimeline}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs transition-colors shrink-0 shadow-sm self-start sm:self-auto"
-            >
-              <Plus className="w-4 h-4" />
-              <span>+ Add Timeline</span>
-            </button>
-          </div>
-
-          {/* Timelines Rows */}
-          <div className="space-y-3">
-            {timelines.map((timeline, index) => (
-              <div
-                key={timeline.id}
-                className="p-4 rounded-xl bg-[#0A0A0A] dark:bg-[#0A0A0A] light:bg-zinc-50 border border-[#2A2A2A] dark:border-[#2A2A2A] light:border-zinc-200 space-y-3"
-              >
-                {/* Timeline Header */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-brand-600/20 text-brand-400 flex items-center justify-center text-[10px] font-bold">
-                      {index + 1}
-                    </span>
-                    <input
-                      type="text"
-                      value={timeline.name}
-                      onChange={(e) => handleUpdateTimeline(index, 'name', e.target.value)}
-                      placeholder={`Clip ${(index + 1).toString().padStart(2, '0')}`}
-                      className="px-2 py-1 rounded bg-[#141414] dark:bg-[#141414] light:bg-white border border-[#2A2A2A] dark:border-[#2A2A2A] light:border-zinc-200 text-xs font-semibold text-white dark:text-white light:text-zinc-900 focus:outline-none focus:border-brand-500 w-44"
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => handleDuplicateTimeline(index)}
-                      className="p-1.5 rounded hover:bg-[#1C1C1C] dark:hover:bg-[#1C1C1C] light:hover:bg-zinc-200 text-zinc-400 hover:text-white transition-colors"
-                      title="Duplicate this timeline"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveTimeline(index)}
-                      disabled={timelines.length <= 1}
-                      className="p-1.5 rounded hover:bg-red-900/40 text-zinc-400 hover:text-red-400 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-                      title={timelines.length <= 1 ? 'At least one timeline is required' : 'Delete timeline'}
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Timestamp Inputs Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
-                  {/* Start Timestamp (HH:MM:SS) - MANDATORY */}
-                  <div className="sm:col-span-5">
-                    <label className="block text-[11px] font-semibold text-zinc-300 dark:text-zinc-300 light:text-zinc-700 mb-1">
-                      Start Timestamp (HH:MM:SS) * <span className="text-red-400 font-bold">Required</span>
-                    </label>
-                    <div className="relative">
-                      <Clock className="w-3.5 h-3.5 text-brand-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      <input
-                        type="text"
-                        required
-                        value={timeline.startHms}
-                        onChange={(e) => handleUpdateTimeline(index, 'startHms', e.target.value)}
-                        placeholder="00:02:15"
-                        pattern="^(?:(?:[0-9]{1,2}:)?[0-5]?[0-9]:[0-5][0-9])$"
-                        className="w-full pl-8 pr-3 py-2 rounded-lg bg-[#141414] dark:bg-[#141414] light:bg-white border border-[#2A2A2A] dark:border-[#2A2A2A] light:border-zinc-300 text-white dark:text-white light:text-zinc-900 font-mono text-xs focus:outline-none focus:border-brand-500"
-                      />
-                    </div>
-                    <span className="text-[10px] text-zinc-400 dark:text-zinc-400 light:text-zinc-500 mt-0.5 block">
-                      Clipping starts from this exact second
-                    </span>
-                  </div>
-
-                  {/* Duration (Seconds) */}
-                  <div className="sm:col-span-4">
-                    <label className="block text-[11px] font-semibold text-zinc-300 dark:text-zinc-300 light:text-zinc-700 mb-1">
-                      Duration (Seconds) *
-                    </label>
-                    <div className="flex gap-1.5 items-center">
-                      <input
-                        type="number"
-                        min="1"
-                        required
-                        value={timeline.duration}
-                        onChange={(e) => handleUpdateTimeline(index, 'duration', e.target.value)}
-                        className="w-20 px-2.5 py-2 rounded-lg bg-[#141414] dark:bg-[#141414] light:bg-white border border-[#2A2A2A] dark:border-[#2A2A2A] light:border-zinc-300 text-white dark:text-white light:text-zinc-900 font-mono text-xs focus:outline-none focus:border-brand-500"
-                      />
-                      <div className="flex gap-1">
-                        {[15, 30, 60].map((dur) => (
-                          <button
-                            key={dur}
-                            type="button"
-                            onClick={() => handleUpdateTimeline(index, 'duration', dur)}
-                            className={`px-2 py-1.5 rounded font-mono text-[10px] font-semibold transition-colors ${
-                              timeline.duration === dur
-                                ? 'bg-brand-600 text-white'
-                                : 'bg-[#1C1C1C] dark:bg-[#1C1C1C] light:bg-zinc-200 text-zinc-300 dark:text-zinc-300 light:text-zinc-700 hover:text-white'
-                            }`}
-                          >
-                            {dur}s
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Auto-Calculated End Timestamp */}
-                  <div className="sm:col-span-3">
-                    <label className="block text-[11px] font-semibold text-zinc-400 dark:text-zinc-400 light:text-zinc-500 mb-1">
-                      End Timestamp
-                    </label>
-                    <div className="px-3 py-2 rounded-lg bg-[#141414] dark:bg-[#141414] light:bg-zinc-100 border border-[#2A2A2A] dark:border-[#2A2A2A] light:border-zinc-200 text-zinc-300 dark:text-zinc-300 light:text-zinc-800 font-mono text-xs font-semibold text-center">
-                      {timeline.endHms}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Large "+ Add Another Timeline" Button */}
-          <button
-            type="button"
-            onClick={handleAddTimeline}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-[#2A2A2A] dark:border-[#2A2A2A] light:border-zinc-300 hover:border-brand-500 text-zinc-300 dark:text-zinc-300 light:text-zinc-700 hover:text-brand-400 text-xs font-semibold transition-all bg-[#0A0A0A]/40"
-          >
-            <Plus className="w-4 h-4 text-brand-400" />
-            <span>+ Add Another Timeline ({timelines.length} Timelines Added)</span>
-          </button>
         </div>
 
         {/* Submit Actions */}

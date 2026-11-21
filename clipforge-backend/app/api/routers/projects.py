@@ -50,6 +50,7 @@ def get_dashboard_stats(user: User = Depends(get_current_user), db: Session = De
         "recent_projects": recent_projects
     }
 
+@router.get("")
 @router.get("/")
 def list_projects(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     projects = (
@@ -83,6 +84,7 @@ def list_projects(user: User = Depends(get_current_user), db: Session = Depends(
         })
     return result
 
+@router.post("", status_code=status.HTTP_201_CREATED)
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def create_project(req: ProjectCreate, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     project = Project(
